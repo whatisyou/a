@@ -289,6 +289,8 @@ function stop(){
     showToast('정지됨', '모니터링을 중지했습니다.', 'good');
   }catch(e){
     console.error(e);
+    const msg = (e && (e.message || e.name)) ? String(e.message || e.name) : '알 수 없는 오류';
+    showToast('시작 실패', msg + '\n- 사이트 알림/오디오 권한을 허용했는지 확인하세요.\n- 시스템 오디오 모드라면 화면/탭 공유를 취소하지 마세요.', 'bad');
   }
 }
 
@@ -297,6 +299,18 @@ stopBtn.addEventListener('click', stop);
 
 // Warm UI
 updateUI(-90);
+
+window.addEventListener('unhandledrejection', (ev)=>{
+  console.error('Unhandled promise rejection:', ev.reason);
+  const msg = (ev && ev.reason && (ev.reason.message || ev.reason.name)) ? String(ev.reason.message || ev.reason.name) : '알 수 없는 오류';
+  showToast('오류', msg, 'bad');
+});
+window.addEventListener('error', (ev)=>{
+  console.error('Window error:', ev.error || ev.message);
+  const msg = (ev && (ev.message || (ev.error && ev.error.message))) ? String(ev.message || ev.error.message) : '스크립트 오류';
+  showToast('오류', msg, 'bad');
+});
+
 </script>
 </body>
 </html>
