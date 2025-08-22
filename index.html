@@ -4,313 +4,261 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>연수가 멈췄다</title>
+  <!-- Clock favicon (SVG data URI) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23fff' stroke='%23000' stroke-width='3'/%3E%3Cline x1='32' y1='32' x2='32' y2='16' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='32' y1='32' x2='44' y2='32' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
   <style>
-    :root{
-      --bg:#0b1020;--panel:#111833;--muted:#8ea0c7;--accent:#7aa2ff;--ok:#2dd4bf;--warn:#fbbf24;--bad:#f87171;--white:#eaf0ff;
+    :root {
+      --bg:#0b1020;
+      --card:#111833;
+      --fg:#e8ecff;
+      --muted:#9aa6d1;
+      --accent:#6ea8fe;
+      --ok:#2ecc71;
+      --warn:#ffcc00;
+      --err:#ff6b6b;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1a2555 0%,#0b1020 80%);font:15px/1.5 ui-sans-serif,system-ui,Segoe UI,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;color:var(--white)}
-    .wrap{max-width:900px;margin:0 auto;padding:28px}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));backdrop-filter: blur(6px);border:1px solid rgba(255,255,255,0.08);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
-    .header{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.07)}
-    .logo{width:38px;height:38px;border-radius:11px;background:conic-gradient(from 210deg at 50% 50%, var(--accent), #9bffdc);display:grid;place-items:center;color:#07122a;font-weight:900}
-    h1{margin:0;font-size:18px}
-    .sub{color:var(--muted);font-size:13px}
-    .content{padding:20px 24px}
-    .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .controls>div{display:flex;gap:6px;align-items:center}
-    select,button{height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a122b;color:var(--white);padding:0 10px}
-    button.primary{background:var(--accent);color:#07122a;border:0;font-weight:700}
-    button.ghost{background:transparent}
-    .meter{margin-top:18px;background:#0a122b;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px}
-    .meterbar{height:14px;background:#07122a;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)}
-    .fill{height:100%;width:0%}
-    .stats{display:flex;gap:16px;margin-top:10px;color:var(--muted);font-size:13px;flex-wrap:wrap}
-    .stat span{display:block;color:var(--white);font-weight:700;font-size:16px}
-    .badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:12px;color:var(--muted)}
-    /* toast */
-    .toast{position:fixed;right:20px;bottom:20px;display:none;max-width:360px;background:#0c142e;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;box-shadow:0 12px 30px rgba(0,0,0,.45);z-index:9999}
-    .toast.show{display:block;animation:slidein .25s ease-out}
-    .toast .title{font-weight:800;margin-bottom:6px}
-    .toast .msg{color:var(--muted);font-size:14px}
-    .toast.good{border-color:rgba(45,212,191,.35)}
-    .toast.warn{border-color:rgba(251,191,36,.35)}
-    .toast.bad{border-color:rgba(248,113,113,.35)}
-    @keyframes slidein{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-    .help{margin-top:12px;font-size:13px;color:var(--muted)}
-    .link{color:#9bffdc}
-    .hidden{display:none}
+    body{
+      margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+      background: linear-gradient(180deg,#0b1020,#0a0f1f 60%, #081022);
+      color:var(--fg);
+      min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .app{
+      width:min(860px,100%); background:var(--card); border:1px solid #1d285a; border-radius:20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4); padding:24px;
+    }
+    h1{margin:0 0 6px; font-size:22px; display:flex; align-items:center; gap:8px}
+    .subtitle{color:var(--muted); font-size:14px; margin-bottom:14px}
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    button{
+      border:0; border-radius:14px; padding:12px 18px; font-weight:700; cursor:pointer;
+      background:var(--accent); color:#081022; transition:transform .05s ease;
+    }
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .select-wrap{background:#0d1440; border:1px solid #1f2b66; border-radius:12px; padding:10px 12px}
+    select{background:transparent; border:0; color:var(--fg); outline:none}
+    .stat{margin-left:auto; font-monospace: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color:var(--muted)}
+    .meter{
+      width:100%; height:12px; background:#0f1430; border-radius:999px; overflow:hidden; margin:10px 0 4px;
+      border:1px solid #1f2b66;
+    }
+    .bar{height:100%; width:0%; background:linear-gradient(90deg, #6ea8fe, #2ecc71)}
+    .label{font-size:12px; color:var(--muted)}
+    .log{
+      margin-top:14px; background:#0b1338; border:1px solid #1b265f; border-radius:12px; padding:12px; height:160px; overflow:auto;
+      font:12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space:pre-wrap;
+    }
+    /* Toast */
+    .toast{
+      position: fixed; right: 18px; bottom: 18px; background:#0b1338; color:var(--fg);
+      border:1px solid #2841a1; border-radius:12px; padding:10px 14px; z-index: 9999; box-shadow:0 10px 20px rgba(0,0,0,.45);
+      max-width: 60vw;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="header">
-        <div class="logo">🕒</div>
-        <div>
-          <h1>연수가 멈췄다</h1>
-          <div class="sub">무음이 10초 이상 계속되면 알림. 이후에도 10초마다 누적시간으로 반복 알림.</div>
-        </div>
-      </div>
-      <div class="content">
-        <div class="controls">
-          <div><label>캡처 소스</label>
-            <select id="source">
-              <option value="sys">시스템 오디오(배너 표시됨)</option>
-              <option value="mic">마이크(배너 없음)</option>
-            </select>
-          </div>
-          <div><label>무음 기준</label>
-            <select id="threshold">
-              <option value="-45">-45 dB (기본)</option>
-              <option value="-40">-40 dB</option>
-              <option value="-50">-50 dB</option>
-              <option value="-55">-55 dB</option>
-              <option value="-60">-60 dB (엄격)</option>
-            </select>
-          </div>
-          <button id="startBtn" class="primary">동작하기</button>
-          <button id="stopBtn" class="ghost">정지</button>
-          <span class="badge"><strong>알림 조건:</strong>&nbsp;무음 10초 지속 → 이후 10초마다 반복</span>
-        </div>
+  <div class="app">
+    <h1>🕒 연수가 멈췄다</h1>
+    <div class="subtitle">무음이 10초 이상 지속되면 알림을 보내고, 이후 10초마다 누적 무음 시간을 다시 알립니다.</div>
 
-        <div class="meter">
-          <div class="meterbar"><div id="fill" class="fill" style="background:linear-gradient(90deg,var(--warn),var(--ok));"></div></div>
-          <div class="stats">
-            <div class="stat">현재 레벨<span id="dbText">—</span></div>
-            <div class="stat">무음 누적<span id="silenceText">0.0s</span></div>
-            <div class="stat">상태<span id="stateText">대기</span></div>
-          </div>
-          <div class="help">
-            시스템 오디오 모드에서는 브라우저의 보안 정책 때문에 크롬 상단에 <em>“이 탭을 공유하는 중”</em> 배너가 표시됩니다. 웹페이지에서 이 배너를 숨기는 방법은 제공되지 않습니다.
-            배너 없이 사용하려면 <strong>마이크 모드</strong>를 사용하세요. (<a class="link" href="https://developer.mozilla.org/docs/Web/API/MediaDevices/getDisplayMedia" target="_blank">기술 배경</a>)
-          </div>
-        </div>
+    <div class="row" style="margin-bottom:8px">
+      <div class="select-wrap">
+        <label for="mode" class="label">입력</label>
+        <select id="mode">
+          <option value="mic" selected>마이크</option>
+          <option value="system">시스템 소리(화면/탭 공유)</option>
+        </select>
       </div>
+      <button id="startBtn">동작하기</button>
+      <button id="stopBtn" disabled>정지</button>
+      <div class="stat"><span id="status">대기</span></div>
     </div>
+
+    <div class="meter"><div id="bar" class="bar"></div></div>
+    <div class="label">현재 입력 크기: <span id="level">0.000</span> · 무음 누적: <span id="silence">0.0</span>s</div>
+
+    <div id="log" class="log"></div>
   </div>
 
-  <div id="toast" class="toast warn">
-    <div class="title">알림</div>
-    <div class="msg">메시지</div>
-  </div>
+  <script>
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+    const barEl = document.getElementById('bar');
+    const levelEl = document.getElementById('level');
+    const silenceEl = document.getElementById('silence');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const modeEl = document.getElementById('mode');
 
-<script>
-const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const sourceSel = document.getElementById('source');
-const thresholdSel = document.getElementById('threshold');
-const dbText = document.getElementById('dbText');
-const silenceText = document.getElementById('silenceText');
-const stateText = document.getElementById('stateText');
-const fill = document.getElementById('fill');
-const toast = document.getElementById('toast');
+    let ctx, analyser, data, rafId, stream;
+    let silenceStart = null;
+    let lastNotifiedStep = 0; // 0: not yet after first 10s. For 10s, step=1, 20s -> 2 ...
+    const SILENCE_THRESHOLD = 0.0035; // empirical ~ -49 dBFS
+    const HZ = 10; // checks per second
+    const FIRST_BEEP_AT = 10; // seconds
+    const REPEAT_EVERY = 10; // seconds
 
-let audioCtx, analyser, mediaStreamSrc, rafId, stream;
-let silenceSeconds = 0;
-const SILENCE_TRIGGER = 10.0; // seconds
-let alarmIntervalId = null;    // for 10s repeating alarms after trigger
-let silentPhase = false;       // currently under 'silence' according to dB threshold
-let lastFrameTs = null;
-
-function showToast(title='알림', msg='메시지', kind='warn'){
-  toast.classList.remove('good','warn','bad');
-  toast.classList.add(kind);
-  toast.querySelector('.title').textContent = title;
-  toast.querySelector('.msg').textContent = msg;
-  toast.classList.add('show');
-  setTimeout(()=>toast.classList.remove('show'), 6000);
-}
-
-
-async function ensureNotifyPermission(){
-  try{
-    if('Notification' in window && Notification.permission === 'default'){
-      await Notification.requestPermission();
+    function log(msg){
+      const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logEl.textContent += (logEl.textContent ? '\\n' : '') + line;
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(line);
     }
-  }catch(e){ /* ignore */ }
-}
-async function notifyOS(title='🔕 무음 감지', msg='입력 소스에서 무음이 지속되고 있습니다.'){
-  try{
-    if('Notification' in window){
-      if(Notification.permission === 'default'){
-        await Notification.requestPermission();
-      }
-      if(Notification.permission === 'granted'){
-        new Notification(title, { body: msg, icon: 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23ffffff' stroke='%23000' stroke-width='3'/%3E%3Cline x1='32' y1='32' x2='32' y2='16' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='32' y1='32' x2='44' y2='32' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E', });
+
+    function showToast(msg, ms=3500){
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(), ms);
+    }
+
+    async function ensureNotifyPermission(){
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'default'){
+        try { await Notification.requestPermission(); } catch(e){}
       }
     }
-  }catch(e){ /* ignore */ }
-}
 
-function rmsToDb(rms){
-  const eps = 1e-12;
-  return 20 * Math.log10(Math.max(rms, eps)); // dBFS approx
-}
-function dbToPct(db){ // Map -90..0 dB to 0..100%
-  const clamped = Math.max(-90, Math.min(0, db));
-  return ((clamped + 90) / 90) * 100;
-}
-
-function updateUI(db){
-  const pct = dbToPct(db);
-  fill.style.width = pct.toFixed(1)+'%';
-  dbText.textContent = db.toFixed(1)+' dB';
-  silenceText.textContent = silenceSeconds.toFixed(1)+'s';
-  stateText.textContent = silentPhase ? '무음 중' : '소리 감지';
-}
-
-function clearAlarmInterval(){
-  if(alarmIntervalId){
-    clearInterval(alarmIntervalId);
-    alarmIntervalId = null;
-  }
-}
-
-function startAlarmLoop(){
-  // fire immediately with current accumulated silence, then every 10s
-  const fire = () => {
-    const sec = Math.floor(silenceSeconds);
-    const title = `🔕 무음 지속 ${sec}s`;
-    const body = `무음이 ${sec}초 동안 계속되고 있습니다.`;
-    showToast(title, body, 'warn');
-    notifyOS(title, body);
-  };
-  fire();
-  clearAlarmInterval();
-  alarmIntervalId = setInterval(fire, 10_000);
-}
-
-function createAnalyser(){
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 2048;
-  analyser.smoothingTimeConstant = 0.4;
-}
-
-function measure(){
-  const buffer = new Uint8Array(analyser.fftSize);
-  analyser.getByteTimeDomainData(buffer);
-  // compute RMS from time-domain samples (0..255 center at 128)
-  let sumSq = 0;
-  for(let i=0;i<buffer.length;i++){
-    const v = (buffer[i] - 128) / 128; // approx -1..1
-    sumSq += v*v;
-  }
-  const rms = Math.sqrt(sumSq / buffer.length);
-  const db = rmsToDb(rms);
-
-  const now = performance.now();
-  if(lastFrameTs == null) lastFrameTs = now;
-  const dt = (now - lastFrameTs) / 1000.0;
-  lastFrameTs = now;
-
-  const thresholdDb = parseFloat(thresholdSel.value);
-  const isSilentNow = db < thresholdDb;
-
-  if(isSilentNow){
-    silenceSeconds += dt;
-    if(!silentPhase){
-      // entering silence
-      silentPhase = true;
-    }
-    // Trigger rule: once silenceSeconds passes SILENCE_TRIGGER, start alarm loop
-    if(silenceSeconds >= SILENCE_TRIGGER && !alarmIntervalId){
-      startAlarmLoop();
-    }
-  }else{
-    // noise detected -> reset silence state
-    silentPhase = false;
-    silenceSeconds = 0;
-    clearAlarmInterval();
-  }
-
-  updateUI(db);
-  rafId = requestAnimationFrame(measure);
-}
-
-async function start(){
-  try{
-    stop(); // reset any previous
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    createAnalyser();
-
-    const choice = sourceSel.value;
-    if(choice === 'sys'){
-      // System/tab audio via getDisplayMedia (shows Chrome sharing banner by design)
-      stream = await navigator.mediaDevices.getDisplayMedia({
-        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-        video: { frameRate: 1, width: 1, height: 1 } // tiny video; we'll ignore it
-      });
-    }else{
-      // Microphone (no banner)
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        video: false
-      });
+    function notifyOS(body){
+      const icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23fff' stroke='%23000' stroke-width='3'/%3E%3Cline x1='32' y1='32' x2='32' y2='16' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='32' y1='32' x2='44' y2='32' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E";
+      if ('Notification' in window && Notification.permission === 'granted'){
+        try{ new Notification('연수가 멈췄다', { body, icon }); }
+        catch(e){ showToast(body); }
+      } else {
+        showToast(body);
+      }
     }
 
-    const audioTrack = stream.getAudioTracks()[0];
-    if(!audioTrack){
-      showToast('오류', '오디오 트랙을 가져오지 못했습니다.', 'bad');
-      return;
+    async function getInputStream(){
+      const mode = modeEl.value;
+      if (mode === 'system'){
+        // Requires user to pick a tab/window/screen. Audio must be enabled in picker.
+        return await navigator.mediaDevices.getDisplayMedia({ video: true, audio: { echoCancellation:false, noiseSuppression:false } });
+      } else {
+        return await navigator.mediaDevices.getUserMedia({ audio: { channelCount:1, echoCancellation:false, noiseSuppression:false, autoGainControl:false } });
+      }
     }
 
-    mediaStreamSrc = audioCtx.createMediaStreamSource(stream);
-    mediaStreamSrc.connect(analyser);
+    function updateUIState(running){
+      startBtn.disabled = running;
+      stopBtn.disabled = !running;
+      statusEl.textContent = running ? '측정 중' : '대기';
+    }
 
-    lastFrameTs = null;
-    silenceSeconds = 0;
-    silentPhase = false;
-    clearAlarmInterval();
-    updateUI(-90);
+    function resetSilence(){
+      silenceStart = null;
+      lastNotifiedStep = 0;
+      silenceEl.textContent = '0.0';
+    }
 
-    if(audioCtx.state === 'suspended'){ await audioCtx.resume(); }
-    rafId = requestAnimationFrame(measure);
+    function rmsFromTimeDomain(u8){
+      // Convert 0..255 to -1..1 then RMS
+      let sum = 0;
+      for (let i=0;i<u8.length;i++){
+        const v = (u8[i]-128)/128;
+        sum += v*v;
+      }
+      return Math.sqrt(sum / u8.length);
+    }
 
-    showToast('시작됨', choice === 'sys' ? '시스템 오디오를 감시합니다. (배너 표시됨)' : '마이크를 감시합니다. (배너 없음)', 'good');
-  }catch(e){
-    console.error(e);
-    showToast('시작 실패', e.message || String(e), 'bad');
-  }
-}
+    function tick(){
+      analyser.getByteTimeDomainData(data);
+      const rms = rmsFromTimeDomain(data);
+      const isSilent = rms < SILENCE_THRESHOLD;
 
-function stop(){
-  try{
-    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
-    if(mediaStreamSrc){ try{ mediaStreamSrc.disconnect(); }catch(e){} mediaStreamSrc = null; }
-    if(analyser){ try{ analyser.disconnect(); }catch(e){} analyser = null; }
-    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
-    silenceSeconds = 0;
-    silentPhase = false;
-    lastFrameTs = null;
-    clearAlarmInterval();
-    updateUI(-90);
-    showToast('정지됨', '모니터링을 중지했습니다.', 'good');
-  }catch(e){
-    console.error(e);
-    const msg = (e && (e.message || e.name)) ? String(e.message || e.name) : '알 수 없는 오류';
-    showToast('시작 실패', msg + '\n- 사이트 알림/오디오 권한을 허용했는지 확인하세요.\n- 시스템 오디오 모드라면 화면/탭 공유를 취소하지 마세요.', 'bad');
-  }
-}
+      levelEl.textContent = rms.toFixed(4);
+      barEl.style.width = Math.max(2, Math.min(100, Math.round(rms*3000))) + '%';
 
-startBtn.addEventListener('click', async () => { await ensureNotifyPermission(); start(); });
-stopBtn.addEventListener('click', stop);
+      const now = performance.now();
+      if (isSilent){
+        if (silenceStart === null){
+          silenceStart = now;
+          lastNotifiedStep = 0;
+        }
+        const elapsed = (now - silenceStart) / 1000;
+        silenceEl.textContent = elapsed.toFixed(1);
 
-// Warm UI
-updateUI(-90);
+        if (elapsed >= FIRST_BEEP_AT){
+          const step = Math.floor((elapsed - FIRST_BEEP_AT) / REPEAT_EVERY) + 1; // 10s=>1, 20s=>2
+          if (step !== lastNotifiedStep){
+            lastNotifiedStep = step;
+            const total = Math.floor(elapsed);
+            notifyOS(`무음 누적 ${total}초`);
+            log(`OS 알림: 무음 누적 ${total}초`);
+          }
+        }
+      } else {
+        if (silenceStart !== null){
+          log(`무음 해제 (누적 ${( (now - silenceStart)/1000 ).toFixed(1)}s)`);
+        }
+        resetSilence();
+      }
 
-window.addEventListener('unhandledrejection', (ev)=>{
-  console.error('Unhandled promise rejection:', ev.reason);
-  const msg = (ev && ev.reason && (ev.reason.message || ev.reason.name)) ? String(ev.reason.message || ev.reason.name) : '알 수 없는 오류';
-  showToast('오류', msg, 'bad');
-});
-window.addEventListener('error', (ev)=>{
-  console.error('Window error:', ev.error || ev.message);
-  const msg = (ev && (ev.message || (ev.error && ev.error.message))) ? String(ev.message || ev.error.message) : '스크립트 오류';
-  showToast('오류', msg, 'bad');
-});
+      rafId = setTimeout(tick, 1000 / HZ);
+    }
 
-</script>
+    async function start(){
+      try{
+        updateUIState(true);
+        await ensureNotifyPermission();
+        resetSilence();
+
+        stream = await getInputStream();
+        if (!stream) throw new Error('오디오 입력 스트림 생성 실패');
+
+        // If system mode, try to favor current tab audio only (where supported)
+        const audioTracks = stream.getAudioTracks();
+        if (!audioTracks || !audioTracks.length){
+          throw new Error('오디오 트랙이 없습니다. (화면/탭 공유 시 오디오 포함 선택 필요)');
+        }
+
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = ctx.createMediaStreamSource(stream);
+        analyser = ctx.createAnalyser();
+        analyser.fftSize = 2048;
+        data = new Uint8Array(analyser.fftSize);
+        src.connect(analyser);
+
+        log('측정 시작');
+        tick();
+      } catch (err){
+        updateUIState(false);
+        const msg = err && err.message ? err.message : String(err);
+        log('오류: ' + msg);
+        showToast('시작 실패: ' + msg, 5000);
+      }
+    }
+
+    function stop(){
+      try{
+        if (rafId){ clearTimeout(rafId); rafId = null; }
+        if (ctx){ ctx.close().catch(()=>{}); ctx = null; }
+        if (stream){
+          stream.getTracks().forEach(t=>t.stop());
+          stream = null;
+        }
+        updateUIState(false);
+        resetSilence();
+        log('정지');
+      } catch(e){}
+    }
+
+    // Wire events
+    startBtn.addEventListener('click', () => { start(); });
+    stopBtn.addEventListener('click', () => { stop(); });
+
+    // Global error guards
+    window.addEventListener('error', (e)=>{
+      showToast('오류: '+ e.message);
+      log('window.error: ' + e.message);
+    });
+    window.addEventListener('unhandledrejection', (e)=>{
+      const m = (e.reason && e.reason.message) ? e.reason.message : String(e.reason);
+      showToast('오류: '+ m);
+      log('unhandledrejection: ' + m);
+    });
+  </script>
 </body>
 </html>
