@@ -2,12 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' blob:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>연수가 멈췄다\1
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%0A  %3Cdefs%3E%0A    %3CradialGradient id=%22g%22 cx=%2232%22 cy=%2232%22 r=%2232%22 gradientUnits=%22userSpaceOnUse%22%3E%0A      %3Cstop offset=%220%22 stop-color=%22%231a2555%22/%3E%0A      %3Cstop offset=%221%22 stop-color=%22%230b1020%22/%3E%0A    %3C/radialGradient%3E%0A  %3C/defs%3E%0A  %3Ccircle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22url(%23g)%22 stroke=%22%237aa2ff%22 stroke-width=%224%22/%3E%0A  %3Ccircle cx=%2232%22 cy=%2232%22 r=%222.5%22 fill=%22%23eaf0ff%22/%3E%0A  %3Cline x1=%2232%22 y1=%2232%22 x2=%2232%22 y2=%2216%22 stroke=%22%23eaf0ff%22 stroke-width=%224%22 stroke-linecap=%22round%22/%3E%0A  %3Cline x1=%2232%22 y1=%2232%22 x2=%2245%22 y2=%2232%22 stroke=%22%23eaf0ff%22 stroke-width=%224%22 stroke-linecap=%22round%22/%3E%0A  %3Cg stroke=%22%23304585%22 stroke-width=%222%22%3E%0A    %3Cline x1=%2232%22 y1=%226%22 x2=%2232%22 y2=%2210%22/%3E%0A    %3Cline x1=%2232%22 y1=%2254%22 x2=%2232%22 y2=%2258%22/%3E%0A    %3Cline x1=%226%22 y1=%2232%22 x2=%2210%22 y2=%2232%22/%3E%0A    %3Cline x1=%2254%22 y1=%2232%22 x2=%2258%22 y2=%2232%22/%3E%0A  %3C/g%3E%0A%3C/svg%3E" />
-
+  <title>연수가 멈췄다</title>
   <style>
     :root{
       --bg:#0b1020;--panel:#111833;--muted:#8ea0c7;--accent:#7aa2ff;--ok:#2dd4bf;--warn:#fbbf24;--bad:#f87171;--white:#eaf0ff;
@@ -51,7 +47,7 @@
   <div class="wrap">
     <div class="card">
       <div class="header">
-        <div class="logo">🔕</div>
+        <div class="logo">🕒</div>
         <div>
           <h1>연수가 멈췄다</h1>
           <div class="sub">무음이 10초 이상 계속되면 알림. 이후에도 10초마다 누적시간으로 반복 알림.</div>
@@ -127,6 +123,14 @@ function showToast(title='알림', msg='메시지', kind='warn'){
   setTimeout(()=>toast.classList.remove('show'), 6000);
 }
 
+
+async function ensureNotifyPermission(){
+  try{
+    if('Notification' in window && Notification.permission === 'default'){
+      await Notification.requestPermission();
+    }
+  }catch(e){ /* ignore */ }
+}
 async function notifyOS(title='🔕 무음 감지', msg='입력 소스에서 무음이 지속되고 있습니다.'){
   try{
     if('Notification' in window){
@@ -134,7 +138,7 @@ async function notifyOS(title='🔕 무음 감지', msg='입력 소스에서 무
         await Notification.requestPermission();
       }
       if(Notification.permission === 'granted'){
-        new Notification(title, { body: msg });
+        new Notification(title, { body: msg, icon: 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23ffffff' stroke='%23000' stroke-width='3'/%3E%3Cline x1='32' y1='32' x2='32' y2='16' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='32' y1='32' x2='44' y2='32' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E', });
       }
     }
   }catch(e){ /* ignore */ }
@@ -288,18 +292,11 @@ function stop(){
   }
 }
 
-startBtn.addEventListener('click', start);
+startBtn.addEventListener('click', async () => { await ensureNotifyPermission(); start(); });
 stopBtn.addEventListener('click', stop);
 
 // Warm UI
 updateUI(-90);
-
-// Safety: stop on page unload or when user hides the tab (optional hardening)
-window.addEventListener('beforeunload', stop);
-document.addEventListener('visibilitychange', () => {
-  // Uncomment next line if you want to auto-stop when tab goes to background:
-  // if (document.hidden) stop();
-});
 </script>
 </body>
 </html>
